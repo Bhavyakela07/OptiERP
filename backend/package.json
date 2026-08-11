@@ -4,7 +4,7 @@
   "description": "Mini ERP + CRM Operations Portal Backend",
   "main": "dist/server.js",
   "scripts": {
-    "dev": "lsof -ti:4000 | xargs kill -9 2>/dev/null || true; tsx watch src/server.ts",
+    "dev": "tsx watch src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
     "seed": "tsx src/scripts/seed.ts",

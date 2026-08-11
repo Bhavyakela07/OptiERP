@@ -14,10 +14,13 @@ dotenv.config({ override: false });
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-// Enable CORS for all origins (or configured Vercel frontend origin)
+// Enable CORS — supports wildcard '*' or specific Vercel origin
+const corsOrigin = process.env.CORS_ORIGIN;
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || '*',
-  credentials: true
+  origin: corsOrigin ? corsOrigin.split(',').map(o => o.trim()) : '*',
+  credentials: !!corsOrigin, // only set credentials=true when a specific origin is set
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cache-Control', 'Pragma'],
 }));
 
 app.use(express.json());

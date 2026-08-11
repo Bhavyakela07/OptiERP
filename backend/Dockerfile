@@ -2,11 +2,14 @@
 FROM node:20-alpine AS base
 WORKDIR /app
 
-# Copy package manifests
+# Copy package manifests first (cached layer)
 COPY package*.json ./
 
 # Install all dependencies
 RUN npm ci
+
+# Cache-bust: force source copy on every deploy
+ARG CACHEBUST=1
 
 # Copy source code and database schema
 COPY . .

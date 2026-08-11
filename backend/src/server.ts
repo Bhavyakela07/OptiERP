@@ -14,11 +14,10 @@ dotenv.config({ override: false });
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-// Enable CORS — supports wildcard '*' or specific Vercel origin
-const corsOrigin = process.env.CORS_ORIGIN;
+// Enable CORS — dynamically reflect requesting origin so all Vercel URLs, previews, & local domains work seamlessly
 app.use(cors({
-  origin: corsOrigin ? corsOrigin.split(',').map(o => o.trim()) : '*',
-  credentials: !!corsOrigin, // only set credentials=true when a specific origin is set
+  origin: (origin, callback) => callback(null, true),
+  credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Cache-Control', 'Pragma'],
 }));

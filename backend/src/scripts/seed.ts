@@ -32,18 +32,15 @@ export async function seedDatabase() {
     const res = await query(
       `INSERT INTO users (name, email, password_hash, role)
        VALUES ($1, $2, $3, $4)
-       ON CONFLICT (email) DO NOTHING
+       ON CONFLICT (email) DO UPDATE
+         SET password_hash = EXCLUDED.password_hash,
+             name = EXCLUDED.name
        RETURNING id, role`,
       [u.name, u.email, hashedPassword, u.role]
     );
 
     if (res.rows.length > 0) {
-      userIds[u.role] = res.rows[0].id;
-    } else {
-      const existing = await query(`SELECT id, role FROM users WHERE email = $1`, [u.email]);
-      if (existing.rows.length > 0) {
-        userIds[existing.rows[0].role] = existing.rows[0].id;
-      }
+      userIds[res.rows[0].role] = res.rows[0].id;
     }
   }
 

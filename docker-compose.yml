@@ -1,0 +1,63 @@
+services:
+  # Container 1: PostgreSQL 16 Database
+  db:
+    image: postgres:16-alpine
+    container_name: optierp-db
+    restart: always
+    environment:
+      POSTGRES_DB: minierp
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/src/db/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d minierp"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - erp-network
+
+  # Container 2: Node.js + TypeScript Express REST API Backend
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: optierp-backend
+    restart: always
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      DATABASE_URL: postgres://postgres:postgres@db:5432/minierp
+      JWT_SECRET: supersecret_optierp_jwt_token_key_2026
+    ports:
+      - "4000:4000"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - erp-network
+
+  # Container 3: React + TypeScript Vite Frontend (Nginx Production Server)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: optierp-frontend
+    restart: always
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+    networks:
+      - erp-network
+
+volumes:
+  postgres_data:
+
+networks:
+  erp-network:
+    driver: bridge

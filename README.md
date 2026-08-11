@@ -28,23 +28,23 @@
 
 ```mermaid
 graph TD
-    Client[React 19 + Vite SPA\n(Vercel Hosting)] -->|REST API over HTTPS| API[Express + TypeScript REST Server\n(Render Web Service)]
-    API --> Auth[JWT & RBAC Middleware]
-    API --> Modules[Business Modules]
+    Client["React 19 + Vite SPA<br/>(Vercel Hosting)"] -->|REST API over HTTPS| API["Express + TypeScript REST API<br/>(Render Web Service)"]
+    API --> Auth["JWT & RBAC Middleware"]
+    API --> Modules["Business Logic Layer"]
     
     subgraph Business Logic Layer
-        Modules --> CRM[CRM & Customer Pipeline Module]
-        Modules --> Inventory[Inventory & Stock Audit Engine]
-        Modules --> Challans[Sales Challans & Dispatch Transaction Engine]
+        Modules --> CRM["CRM & Customer Pipeline"]
+        Modules --> Inventory["Inventory & Stock Audit Engine"]
+        Modules --> Challans["Sales Challans & Dispatch Engine"]
     end
 
     subgraph Data & Storage Engine
-        CRM --> DB[(PostgreSQL / In-Memory SQL Engine)]
+        CRM --> DB[("PostgreSQL / In-Memory Database")]
         Inventory --> DB
         Challans --> DB
     end
 
-    Client -->|Print CSS Engine| PDF[Tax Invoice PDF / A4 Print Layout]
+    Client -->|Print CSS Engine| PDF["Tax Invoice PDF / A4 Print Layout"]
 ```
 
 ---

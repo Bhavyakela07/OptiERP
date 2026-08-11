@@ -1,23 +1,26 @@
-# 🚀 OptiERP — Enterprise Operations, Inventory & CRM System
-
-[![React 19](https://img.shields.io/badge/Frontend-React_19_%2B_Vite-61DAFB?style=for-the-badge&logo=react)](https://react.dev/)
-[![TypeScript](https://img.shields.io/badge/Language-TypeScript_5-3178C6?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
-[![Node.js](https://img.shields.io/badge/Backend-Node.js_%2B_Express-339933?style=for-the-badge&logo=nodedotjs)](https://nodejs.org/)
-[![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL-4169E1?style=for-the-badge&logo=postgresql)](https://www.postgresql.org/)
-[![Vercel](https://img.shields.io/badge/Deploy-Vercel_Frontend-000000?style=for-the-badge&logo=vercel)](https://vercel.com/)
-[![Render](https://img.shields.io/badge/Deploy-Render_Backend-46E3B7?style=for-the-badge&logo=render)](https://render.com/)
-
-**OptiERP** is a modern, high-performance, full-stack **Enterprise Resource Planning (ERP) and Customer Relationship Management (CRM) System** designed specifically for wholesale distributors, warehouse operations, and sales organizations.
-
-It features **role-based access control (RBAC)**, **transactional stock audits**, **price snapshotting on sales dispatches**, **customer relationship management with 15-day suspension workflows**, and **print-ready A4 Tax Invoice PDF generation**.
+# 🚀 OptiERP — Enterprise ERP & CRM Operations Portal
 
 ---
 
-## 🔗 Live Deployments & Repository
+<p align="center">
+  <img src="https://img.shields.io/badge/OPTIERP-555555?style=for-the-badge" alt="OptiERP" />
+  <img src="https://img.shields.io/badge/ENTERPRISE%20ERP%20%2B%20CRM-1e1e1e?style=for-the-badge" alt="Enterprise ERP CRM" />
+  <img src="https://img.shields.io/badge/TS-TYPESCRIPT-007ACC?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/REACT%2019-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React 19" />
+  <img src="https://img.shields.io/badge/NODE.JS-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" alt="Node.js" />
+  <img src="https://img.shields.io/badge/POSTGRESQL-2E7D32?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL" />
+  <img src="https://img.shields.io/badge/VERCEL-000000?style=for-the-badge&logo=vercel&logoColor=white" alt="Vercel" />
+  <br />
+  <img src="https://img.shields.io/badge/RENDER-46E3B7?style=for-the-badge&logo=render&logoColor=black" alt="Render" />
+</p>
 
-- 🌐 **Live Frontend (Vercel)**: [https://opti-erp.vercel.app](https://opti-erp.vercel.app)
-- ⚙️ **Live Backend API (Render)**: [https://optierp.onrender.com](https://optierp.onrender.com)
-- 🐙 **GitHub Repository**: [https://github.com/Bhavyakela07/OptiERP.git](https://github.com/Bhavyakela07/OptiERP.git)
+<h3 align="center">A Production-Quality, Multi-Role Operations System for Wholesale & Distribution Enterprises</h3>
+
+<p align="center">
+  <a href="https://opti-erp.vercel.app/"><b>Live Frontend Application</b></a> • 
+  <a href="https://optierp.onrender.com"><b>Live Backend API Service</b></a> • 
+  <a href="https://github.com/Bhavyakela07/OptiERP"><b>GitHub Repository</b></a>
+</p>
 
 ---
 
@@ -169,19 +172,9 @@ Authenticates user and returns JWT token.
 #### `GET /api/auth/me`
 Fetches current logged-in user profile.
 - **Headers**: `Authorization: Bearer <token>`
-- **Response (200 OK)**: User object.
 
 #### `POST /api/auth/users` *(Admin Only)*
 Creates a new user account inside the system.
-- **Request Body**:
-  ```json
-  {
-    "name": "New Manager",
-    "email": "manager@company.com",
-    "password": "password123",
-    "role": "Sales"
-  }
-  ```
 
 ---
 
@@ -190,43 +183,12 @@ Creates a new user account inside the system.
 #### `GET /api/customers`
 Paginated search & list of customers.
 - **Query Params**: `page=1&limit=10&search=Rajesh&status=Active`
-- **Response (200 OK)**:
-  ```json
-  {
-    "data": [
-      {
-        "id": "uuid",
-        "name": "Rajesh Patel",
-        "business_name": "Patel Wholesale Traders",
-        "email": "rajesh@pateltraders.com",
-        "mobile": "9825012345",
-        "gst_number": "24AAACP1234A1Z5",
-        "status": "Active"
-      }
-    ],
-    "pagination": { "page": 1, "limit": 10, "total": 1, "totalPages": 1 }
-  }
-  ```
 
 #### `POST /api/customers`
-Creates a new customer.
-- **Request Body**:
-  ```json
-  {
-    "name": "Sunil Mehta",
-    "mobile": "9892098765",
-    "email": "sunil@mehta-agencies.in",
-    "business_name": "Mehta Industrial Agencies",
-    "gst_number": "27AAAFM5678B1Z2",
-    "customer_type": "Distributor",
-    "address": "Plot 45, MIDC Industrial Area, Thane, Maharashtra",
-    "status": "Active"
-  }
-  ```
+Creates a new customer (enforces GST, Email, Phone <= 10 digits).
 
 #### `POST /api/customers/:id/suspend` *(Admin Only)*
 Suspends a customer for 15 days.
-- **Request Body**: `{ "duration_days": 15, "reason": "Payment overdue" }`
 
 #### `DELETE /api/customers/:id` *(Admin Only)*
 Deletes a customer profile permanently.
@@ -237,26 +199,12 @@ Deletes a customer profile permanently.
 
 #### `GET /api/products`
 Lists catalog products with optional low stock filtering.
-- **Query Params**: `low_stock=true&search=Bolt`
 
 #### `POST /api/products` *(Admin / Warehouse)*
 Creates a new product item.
-- **Request Body**:
-  ```json
-  {
-    "name": "Heavy Duty Steel Hex Bolt M12",
-    "sku": "SKU-BOLT-M12",
-    "category": "Hardware",
-    "unit_price": 45.50,
-    "current_stock": 1200,
-    "min_stock_alert": 200,
-    "location": "Rack A-01"
-  }
-  ```
 
 #### `POST /api/products/:id/stock-movements` *(Admin / Warehouse)*
 Records stock inventory IN or OUT.
-- **Request Body**: `{ "quantity": 100, "movement_type": "IN", "reason": "Restock supplier delivery" }`
 
 ---
 
@@ -264,16 +212,6 @@ Records stock inventory IN or OUT.
 
 #### `POST /api/challans` *(Admin / Sales)*
 Drafts a new sales challan with unit price snapshotting.
-- **Request Body**:
-  ```json
-  {
-    "customer_id": "customer-uuid",
-    "items": [
-      { "product_id": "product-uuid-1", "quantity": 10 },
-      { "product_id": "product-uuid-2", "quantity": 5 }
-    ]
-  }
-  ```
 
 #### `POST /api/challans/:id/confirm` *(Admin / Sales)*
 Confirms challan dispatch & atomically decrements inventory stock.

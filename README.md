@@ -1,194 +1,349 @@
-# 🚀 OptiERP — Mini ERP + CRM Operations Portal
+# 🚀 OptiERP — Enterprise Operations, Inventory & CRM System
 
-A modern, full-stack **Enterprise Operations, Inventory & CRM System** built for wholesale distributors, warehouse operations, and sales teams. Featuring real-time transactional stock audits, price snapshotting on sales dispatches, role-based access control, customer relationship follow-up management, and print-ready A4 Tax Invoice PDF generation.
+[![React 19](https://img.shields.io/badge/Frontend-React_19_%2B_Vite-61DAFB?style=for-the-badge&logo=react)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/Language-TypeScript_5-3178C6?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
+[![Node.js](https://img.shields.io/badge/Backend-Node.js_%2B_Express-339933?style=for-the-badge&logo=nodedotjs)](https://nodejs.org/)
+[![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL-4169E1?style=for-the-badge&logo=postgresql)](https://www.postgresql.org/)
+[![Vercel](https://img.shields.io/badge/Deploy-Vercel_Frontend-000000?style=for-the-badge&logo=vercel)](https://vercel.com/)
+[![Render](https://img.shields.io/badge/Deploy-Render_Backend-46E3B7?style=for-the-badge&logo=render)](https://render.com/)
+
+**OptiERP** is a modern, high-performance, full-stack **Enterprise Resource Planning (ERP) and Customer Relationship Management (CRM) System** designed specifically for wholesale distributors, warehouse operations, and sales organizations.
+
+It features **role-based access control (RBAC)**, **transactional stock audits**, **price snapshotting on sales dispatches**, **customer relationship management with 15-day suspension workflows**, and **print-ready A4 Tax Invoice PDF generation**.
 
 ---
 
-## 🌟 Key Features
+## 🔗 Live Deployments & Repository
+
+- 🌐 **Live Frontend (Vercel)**: [https://opti-erp.vercel.app](https://opti-erp.vercel.app)
+- ⚙️ **Live Backend API (Render)**: [https://optierp.onrender.com](https://optierp.onrender.com)
+- 🐙 **GitHub Repository**: [https://github.com/Bhavyakela07/OptiERP.git](https://github.com/Bhavyakela07/OptiERP.git)
+
+---
+
+## 🏛️ System Architecture
+
+```mermaid
+graph TD
+    Client[React 19 + Vite SPA\n(Vercel Hosting)] -->|REST API over HTTPS| API[Express + TypeScript REST Server\n(Render Web Service)]
+    API --> Auth[JWT & RBAC Middleware]
+    API --> Modules[Business Modules]
+    
+    subgraph Business Logic Layer
+        Modules --> CRM[CRM & Customer Pipeline Module]
+        Modules --> Inventory[Inventory & Stock Audit Engine]
+        Modules --> Challans[Sales Challans & Dispatch Transaction Engine]
+    end
+
+    subgraph Data & Storage Engine
+        CRM --> DB[(PostgreSQL / In-Memory SQL Engine)]
+        Inventory --> DB
+        Challans --> DB
+    end
+
+    Client -->|Print CSS Engine| PDF[Tax Invoice PDF / A4 Print Layout]
+```
+
+---
+
+## ✨ Key Features & Business Capabilities
 
 ### 🔐 1. Authentication & Role-Based Access Control (RBAC)
-- **Role Permissions**:
-  - **Admin**: Full system permissions (User management, customer suspension/unsuspension/deletion, product deletion, sales challan management).
-  - **Sales**: Customer creation, CRM follow-up tracking, sales challan drafting & confirmation.
-  - **Warehouse**: Product management, stock quantity adjustments, product deletion.
-- **Inline User Generation**: Admins can generate new team accounts directly inside the user profile section.
-- **Validation**: Enforces minimum 6-character passwords and valid email credentials.
+- **Multi-Role Security Engine**:
+  - 👑 **Admin**: Complete system governance. User creation, customer account suspensions/unsuspensions, customer deletions, product deletions, and challan overrides.
+  - 💼 **Sales**: Customer profile management, CRM follow-up tracking, draft sales challan creation, and dispatch confirmation.
+  - 📦 **Warehouse**: Inventory product catalog management, stock IN/OUT manual adjustments, low-stock threshold auditing, and product deletions.
+  - 📊 **Accounts**: Read-only financial dispatch review, tax invoice generation, and ledger auditing.
+- **Inline Team Onboarding**: Admins can generate new team accounts directly inside the user profile view.
+- **Security Best Practices**: Passwords hashed with `bcryptjs` (salt factor 10), JWT tokens with 24-hour expiration, and strict validation via `Zod`.
 
 ### 👥 2. Customer Relationship Management (CRM)
-- **Compulsory Account Fields**: Enforces mandatory Email, GST Number, Business Name, and Mobile Number (max 10 digits).
-- **15-Day Suspension Controls**: Admin can temporarily suspend customer accounts with auto-unsuspend schedules.
-- **Follow-up Pipeline**: Track customer interaction logs, follow-up dates, and status transitions (`Lead` → `Active` → `Suspended`).
-- **Account Deletion**: Protected permanent deletion for duplicate/inactive customer accounts.
+- **Mandatory Validation Engine**: Enforces compulsory Email Address, GSTIN number (`24AAACP...`), Business Name, and Mobile Number (strict 10-digit limit).
+- **15-Day Account Suspension Controls**: Allows Admins to temporarily freeze accounts with auto-unsuspend calculation schedules and suspension reason tracking.
+- **CRM Follow-Up Pipeline**: Log customer interaction notes, set future follow-up reminder dates, and track lifecycle status (`Lead` → `Active` → `Suspended`).
+- **Account Protection & Clean Deletions**: Permanent customer record deletion reserved strictly for Admins with clean cascades.
 
-### 📦 3. Products & Stock Control
-- **Inventory Tracking**: Monitor current stock, minimum stock thresholds, unit prices, and categories.
-- **Low Stock Audit**: Filter products experiencing stock shortfalls with low-stock badges.
-- **Product Deletion & Movement Cascade**: Admin/Warehouse users can delete products along with their linked stock audit histories.
+### 📦 3. Products & Stock Control Engine
+- **Inventory Tracking**: Monitor stock levels, SKU codes, categories, unit prices, and warehouse bin locations.
+- **Real-Time Low Stock Alerts**: Highlights items falling below minimum stock threshold buffers.
+- **Stock Movement Audit Logs**: Full transactional history of manual stock adjustments (`IN` vs `OUT`) with timestamps and user references.
+- **Cascading Product Cleanups**: Deleting a product automatically cleans up corresponding stock movement histories without leaving orphaned rows.
 
-### 📜 4. Sales Challans & Dispatch Transaction Engine
-- **Price Snapshotting**: Freezes unit prices at the time of challan creation to protect past orders against future price updates.
-- **Pre-Dispatch Stock Verification Audit**: Interactive modal audits warehouse stock against requested quantities before confirming dispatches.
-- **Row-Lock Protection**: Prevents overselling stock when requested quantity exceeds available inventory.
+### 📜 4. Sales Challans & Price Snapshot Engine
+- **Unit Price Snapshotting**: Unit prices are frozen at the exact time of challan creation, ensuring past orders remain financially immutable even if product list prices are updated later.
+- **Pre-Dispatch Stock Verification Audit**: Interactive modal validates available inventory against requested quantities before confirming dispatches.
+- **Atomic Stock Deduction**: Confirming a sales challan atomically decrements inventory stock in a database transaction, preventing negative stock levels.
 
-### 📄 5. Formal Tax Invoice & PDF Export
-- **Printable A4 Tax Invoice Document**: Modern CSS print layout optimized for clean PDF export.
-- **Includes**: Company branding logo (`icon.png`), Customer GSTIN/Address, Itemized SKU breakdown, CGST (9%) + SGST (9%) breakdown, Grand Total in Indian Rupee Words (e.g. *"Rupees Twelve Thousand Five Hundred Only"*), HDFC Bank payment details, Terms & Conditions, and Authorized Signatory block.
-- **On-Screen Invoice Preview**: Standalone `EyeIcon` preview modal to review tax invoice layouts before printing.
+### 📄 5. Printable A4 Tax Invoice & PDF Export
+- **Print-Optimized CSS (`@media print`)**: Formatted for standard A4 paper size, hiding UI navigation bars, buttons, and ambient backgrounds.
+- **Complete Indian GST Compliance Breakdown**:
+  - Company branding logo (`icon.png`) with crisp header typography.
+  - Customer GSTIN, Billed To address, and Shipping details.
+  - Itemized table showing HSN/SKU, Quantity, Unit Price, and Line Total.
+  - Auto-calculated **CGST (9%)** + **SGST (9%)** or **IGST (18%)**.
+  - **Grand Total converted to Rupee Words** (e.g. *"Rupees Twelve Thousand Five Hundred Only"*).
+  - HDFC Bank payment details, Terms & Conditions, and Authorized Signatory signature block.
+- **Interactive On-Screen Preview**: Standalone `EyeIcon` preview modal to inspect tax invoices before printing.
+
+---
+
+## 🛡️ Role & Permissions Matrix
+
+| Feature / Action | Admin | Sales | Warehouse | Accounts |
+| :--- | :---: | :---: | :---: | :---: |
+| **Login & View Dashboard** | ✅ | ✅ | ✅ | ✅ |
+| **View Customer List & Details** | ✅ | ✅ | ✅ | ✅ |
+| **Create / Edit Customer** | ✅ | ✅ | ❌ | ❌ |
+| **Suspend / Unsuspend Customer** | ✅ | ❌ | ❌ | ❌ |
+| **Delete Customer** | ✅ | ❌ | ❌ | ❌ |
+| **Add CRM Follow-Up Notes** | ✅ | ✅ | ❌ | ❌ |
+| **View Product Inventory** | ✅ | ✅ | ✅ | ✅ |
+| **Create / Edit Product** | ✅ | ❌ | ✅ | ❌ |
+| **Record Stock Movement (IN/OUT)** | ✅ | ❌ | ✅ | ❌ |
+| **Delete Product** | ✅ | ❌ | ✅ | ❌ |
+| **Create Sales Challan** | ✅ | ✅ | ❌ | ❌ |
+| **Confirm Challan & Deduct Stock** | ✅ | ✅ | ❌ | ❌ |
+| **Preview & Export Tax Invoice PDF** | ✅ | ✅ | ✅ | ✅ |
+| **Create New System Users** | ✅ | ❌ | ❌ | ❌ |
 
 ---
 
 ## 🛠️ Technology Stack
 
-| Layer | Technology |
-| :--- | :--- |
-| **Frontend** | React 19, TypeScript, Vite, React Router v7 |
-| **Styling** | Vanilla CSS Design System with Dark/Light Modes & Glassmorphic UI |
-| **Backend** | Node.js, Express, TypeScript, Zod Validation |
-| **Database** | In-Memory PostgreSQL Engine (`pg-mem`) / PostgreSQL Driver (`pg`) |
-| **Testing** | Node.js Native Test Runner (`tsx --test`) |
-| **Deployment** | **Vercel** (Frontend) & **Render** (Backend) |
+### Frontend Architecture
+- **Framework**: React 19 + Vite 8
+- **Language**: TypeScript 5
+- **Routing**: React Router v7 (`BrowserRouter`)
+- **HTTP Client**: Axios with request interceptors for JWT injection
+- **Styling**: Vanilla CSS Design System with CSS Variables, Dark/Light Mode toggle, Glassmorphism, and `@media print` rules
+
+### Backend Architecture
+- **Runtime**: Node.js v20+
+- **Framework**: Express.js
+- **Language**: TypeScript 5
+- **Validation**: Zod Schemas
+- **Authentication**: JWT (`jsonwebtoken`) & `bcryptjs`
+- **Database Engine**: PostgreSQL Driver (`pg`) with automatic In-Memory fallback (`pg-mem`) for zero-configuration deployments
 
 ---
 
-## 📂 Project Structure
+## 🔑 Default Credentials
 
-```
-mini-erp-crm/
-├── backend/                  # Express + Node.js TypeScript API
-│   ├── src/
-│   │   ├── config/           # Database setup & connection helpers
-│   │   ├── middleware/       # Auth JWT, Role RBAC & Zod Validation
-│   │   ├── modules/          # Auth, Customers, Products, Challans
-│   │   ├── scripts/          # Database seeding scripts
-│   │   └── server.ts         # Server entry point & route mounting
-│   ├── test/                 # 21/21 Automated Integration Tests
-│   ├── render.yaml           # Render deployment configuration
-│   └── package.json
-│
-├── frontend/                 # React 19 + Vite SPA
-│   ├── public/
-│   │   └── icon.png          # High-resolution company logo
-│   ├── src/
-│   │   ├── api/              # Axios HTTP client with Bearer Token auth
-│   │   ├── components/       # Header, Sidebar, GlassCard, StatusBadge
-│   │   ├── pages/            # Login, Customers, Products, Challans, Detail
-│   │   └── index.css         # Complete Design System & @media print styles
-│   ├── vercel.json           # Vercel SPA routing configuration
-│   └── package.json
-│
-├── render.yaml               # Root Render Blueprint file
-├── .gitignore                # Repository root ignore rules
-└── README.md
-```
+The system automatically initializes default user accounts upon server startup:
+
+| Role | Email Address | Default Password |
+| :--- | :--- | :--- |
+| **Admin** | `admin@company.com` | `password123` |
+| **Sales** | `sales@company.com` | `sales123` |
+| **Warehouse** | `warehouse@company.com` | `warehouse123` |
+| **Accounts** | `accounts@company.com` | `accounts123` |
 
 ---
 
-## ⚙️ Local Development Setup
+## 📡 Complete REST API Reference
+
+### 1. Auth Module (`/api/auth`)
+
+#### `POST /api/auth/login`
+Authenticates user and returns JWT token.
+- **Request Body**:
+  ```json
+  {
+    "email": "admin@company.com",
+    "password": "password123"
+  }
+  ```
+- **Response (200 OK)**:
+  ```json
+  {
+    "token": "eyJhbGciOiJIUzI1Ni...",
+    "user": {
+      "id": "uuid-v4",
+      "name": "Admin User",
+      "email": "admin@company.com",
+      "role": "Admin"
+    }
+  }
+  ```
+
+#### `GET /api/auth/me`
+Fetches current logged-in user profile.
+- **Headers**: `Authorization: Bearer <token>`
+- **Response (200 OK)**: User object.
+
+#### `POST /api/auth/users` *(Admin Only)*
+Creates a new user account inside the system.
+- **Request Body**:
+  ```json
+  {
+    "name": "New Manager",
+    "email": "manager@company.com",
+    "password": "password123",
+    "role": "Sales"
+  }
+  ```
+
+---
+
+### 2. Customers Module (`/api/customers`)
+
+#### `GET /api/customers`
+Paginated search & list of customers.
+- **Query Params**: `page=1&limit=10&search=Rajesh&status=Active`
+- **Response (200 OK)**:
+  ```json
+  {
+    "data": [
+      {
+        "id": "uuid",
+        "name": "Rajesh Patel",
+        "business_name": "Patel Wholesale Traders",
+        "email": "rajesh@pateltraders.com",
+        "mobile": "9825012345",
+        "gst_number": "24AAACP1234A1Z5",
+        "status": "Active"
+      }
+    ],
+    "pagination": { "page": 1, "limit": 10, "total": 1, "totalPages": 1 }
+  }
+  ```
+
+#### `POST /api/customers`
+Creates a new customer.
+- **Request Body**:
+  ```json
+  {
+    "name": "Sunil Mehta",
+    "mobile": "9892098765",
+    "email": "sunil@mehta-agencies.in",
+    "business_name": "Mehta Industrial Agencies",
+    "gst_number": "27AAAFM5678B1Z2",
+    "customer_type": "Distributor",
+    "address": "Plot 45, MIDC Industrial Area, Thane, Maharashtra",
+    "status": "Active"
+  }
+  ```
+
+#### `POST /api/customers/:id/suspend` *(Admin Only)*
+Suspends a customer for 15 days.
+- **Request Body**: `{ "duration_days": 15, "reason": "Payment overdue" }`
+
+#### `DELETE /api/customers/:id` *(Admin Only)*
+Deletes a customer profile permanently.
+
+---
+
+### 3. Products Module (`/api/products`)
+
+#### `GET /api/products`
+Lists catalog products with optional low stock filtering.
+- **Query Params**: `low_stock=true&search=Bolt`
+
+#### `POST /api/products` *(Admin / Warehouse)*
+Creates a new product item.
+- **Request Body**:
+  ```json
+  {
+    "name": "Heavy Duty Steel Hex Bolt M12",
+    "sku": "SKU-BOLT-M12",
+    "category": "Hardware",
+    "unit_price": 45.50,
+    "current_stock": 1200,
+    "min_stock_alert": 200,
+    "location": "Rack A-01"
+  }
+  ```
+
+#### `POST /api/products/:id/stock-movements` *(Admin / Warehouse)*
+Records stock inventory IN or OUT.
+- **Request Body**: `{ "quantity": 100, "movement_type": "IN", "reason": "Restock supplier delivery" }`
+
+---
+
+### 4. Sales Challans Module (`/api/challans`)
+
+#### `POST /api/challans` *(Admin / Sales)*
+Drafts a new sales challan with unit price snapshotting.
+- **Request Body**:
+  ```json
+  {
+    "customer_id": "customer-uuid",
+    "items": [
+      { "product_id": "product-uuid-1", "quantity": 10 },
+      { "product_id": "product-uuid-2", "quantity": 5 }
+    ]
+  }
+  ```
+
+#### `POST /api/challans/:id/confirm` *(Admin / Sales)*
+Confirms challan dispatch & atomically decrements inventory stock.
+
+---
+
+## ⚡ Local Installation & Development Guide
 
 ### Prerequisites
-- **Node.js**: v18.0.0 or higher
-- **npm**: v9.0.0 or higher
+- **Node.js**: `v18.0.0` or higher
+- **npm**: `v9.0.0` or higher
+- **Git**: Installed on system
 
-### 1. Backend Setup
+### 1. Clone Repository
+```bash
+git clone https://github.com/Bhavyakela07/OptiERP.git
+cd OptiERP
+```
+
+### 2. Setup & Run Backend
 ```bash
 cd backend
 npm install
 npm run dev
 ```
-*Backend server will start listening on `http://localhost:4000` with auto-seeded demo records.*
+*Backend will start on `http://localhost:4000` with auto-seeded demo database.*
 
-### 2. Frontend Setup
+### 3. Setup & Run Frontend
 ```bash
-cd frontend
+cd ../frontend
 npm install
 npm run dev
 ```
-*Vite frontend server will start listening on `http://localhost:5173`.*
+*Frontend will launch on `http://localhost:5173`.*
 
-### 3. Run Backend Integration Tests
+### 4. Run Automated Integration Tests
 ```bash
-cd backend
+cd ../backend
 npm test
 ```
-*Executes all 21 automated integration tests covering authentication, RBAC, customer management, inventory control, product deletion, and challan transactions.*
+*Executes all 21 automated backend tests validating RBAC, auth, customer suspensions, stock movements, and challan dispatches.*
 
 ---
 
-## 🔑 Default Login Credentials
+## 🌐 Deployment Configuration
 
-| Role | Email | Password | Allowed Permissions |
-| :--- | :--- | :--- | :--- |
-| **Admin** | `admin@minierpcrm.com` | `admin123` | Full access, User Creation, Deletions & Suspensions |
-| **Sales** | `sales@minierpcrm.com` | `sales123` | Customers, CRM Follow-ups, Create & Dispatch Challans |
-| **Warehouse** | `warehouse@minierpcrm.com` | `warehouse123` | Products, Stock Adjustments, Product Deletions |
+### Frontend Deployment (Vercel)
+1. Import repository `Bhavyakela07/OptiERP` into Vercel.
+2. Set **Root Directory** to `frontend`.
+3. Set **Framework Preset** to `Vite`.
+4. Add Environment Variable:
+   - `VITE_API_URL`: `https://optierp.onrender.com`
+5. Deploy.
 
----
-
-## 🌐 Deployment Instructions
-
-### 📡 Deploy Backend on Render (Web Service)
-
-1. Push your code to your **GitHub / GitLab repository**.
-2. Log into [Render Dashboard](https://dashboard.render.com/) and click **New +** → **Web Service**.
-3. Connect your repository.
-4. Configure the Web Service settings:
-   - **Name**: `mini-erp-crm-backend`
-   - **Root Directory**: `backend`
-   - **Environment**: `Node`
-   - **Build Command**: `npm install && npm run build`
-   - **Start Command**: `npm run start`
-5. Add **Environment Variables**:
+### Backend Deployment (Render)
+1. Create a **Web Service** on Render connected to `Bhavyakela07/OptiERP`.
+2. Set **Root Directory** to `backend`.
+3. Set **Environment** to `Node`.
+4. Set **Build Command**: `npm install && npm run build`
+5. Set **Start Command**: `npm run seed && node dist/server.js`
+6. Add Environment Variables:
    - `NODE_ENV`: `production`
-   - `PORT`: `4000`
-   - `JWT_SECRET`: `your_super_secret_jwt_key_here`
-   - `CORS_ORIGIN`: `*` *(or your Vercel frontend URL)*
-6. Click **Create Web Service**. Your backend live URL will be generated (e.g. `https://mini-erp-crm-backend.onrender.com`).
-
----
-
-### 🚀 Deploy Frontend on Vercel
-
-1. Log into [Vercel Dashboard](https://vercel.com/) and click **Add New** → **Project**.
-2. Import your GitHub repository.
-3. In the project setup panel:
-   - **Framework Preset**: `Vite`
-   - **Root Directory**: Click **Edit** and select `frontend`
-4. Expand **Environment Variables**:
-   - **Key**: `VITE_API_URL`
-   - **Value**: `https://mini-erp-crm-backend.onrender.com` *(Replace with your live Render backend URL)*
-5. Click **Deploy**. Vercel will build the frontend assets and host your application live!
-
----
-
-## 📡 API Endpoints Reference
-
-### 🔐 Authentication (`/auth` or `/api/auth`)
-- `POST /auth/login` — Login user & return JWT token.
-- `GET /auth/me` — Return currently authenticated user profile.
-- `POST /auth/users` — Generate new user account (Admin only).
-
-### 👥 Customers (`/customers` or `/api/customers`)
-- `GET /customers` — List customers with search & status filters.
-- `GET /customers/:id` — Get detailed customer profile with follow-up logs.
-- `POST /customers` — Create customer (compulsory email, phone <= 10 digits, GSTIN).
-- `POST /customers/:id/suspend` — Suspend customer for 15 days (Admin only).
-- `POST /customers/:id/unsuspend` — Reactivate suspended account (Admin only).
-- `DELETE /customers/:id` — Permanently delete customer account (Admin only).
-
-### 📦 Products (`/products` or `/api/products`)
-- `GET /products` — List inventory products with low stock filter.
-- `POST /products` — Create new product item.
-- `POST /products/:id/stock` — Record stock movement IN/OUT transaction.
-- `DELETE /products/:id` — Delete product & linked stock history (Admin/Warehouse).
-
-### 📜 Challans (`/challans` or `/api/challans`)
-- `GET /challans` — List dispatches and filter by status (`Draft`, `Confirmed`, `Cancelled`).
-- `GET /challans/:id` — Get full challan details & line item snapshots.
-- `POST /challans` — Create draft challan with frozen unit price snapshots.
-- `POST /challans/:id/confirm` — Confirm dispatch & decrement stock atomically.
-- `POST /challans/:id/cancel` — Cancel draft/dispatched challan.
+   - `PORT`: `10000`
+   - `USE_IN_MEMORY_DB`: `true`
+   - `CORS_ORIGIN`: `*`
+   - `ADMIN_EMAIL`: `admin@company.com`
+   - `ADMIN_PASSWORD`: `password123`
+7. Deploy.
 
 ---
 
 ## 📄 License
-This project is licensed under the **MIT License**.
+This project is released under the **MIT License**.
